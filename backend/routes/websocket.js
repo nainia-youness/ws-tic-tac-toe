@@ -168,6 +168,52 @@ const add_move= async(ws,user_id,game_id,move)=>{
     }
 }
 
+const is_game_ended =(game_state,gamer1_id,gamer2_id)=>{
+
+    if(game_state.length<5)
+        return undefined
+    const winning_combinations=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[6,4,2]]
+    let boxList=['_','_','_','_','_','_','_','_','_']
+    //add to boxList ex => ['u1', '_',  'u2','u2', 'u2', '_','u1', 'u1', 'u1']
+    for(const i in game_state){
+            const move= game_state[i].move
+            if(game_state[i].user_id==gamer1_id){
+                boxList[move]=gamer1_id
+        }
+        else if(game_state[i].user_id==gamer2_id){
+            boxList[move]=gamer2_id
+        }
+    }
+    //check if someone won
+    for(const i in winning_combinations){
+            const index1=winning_combinations[i][0]
+            const index2=winning_combinations[i][1]
+            const index3=winning_combinations[i][2]
+
+            if(boxList[index1]!='_' && boxList[index1]==boxList[index2] && boxList[index1]==boxList[index3]){
+                let is_host_won=false
+                if(boxList[index1]==gamer1_id){
+                    is_host_won=true                        
+                }
+                else{
+                    is_host_won=false
+                }
+                const winner_id= is_host_won ? gamer1_id : gamer2_id
+                const loser_id=  !is_host_won ? gamer1_id : gamer2_id
+                return {
+                        method:"game_end",
+                        winning_indexes:[index1,index2,index3],
+                        end_game_state:{
+                            winner_id:winner_id,
+                            loser_id:loser_id
+                        }
+                }
+            }
+    }
+    return undefined
+}
+
+
 const update_game_state =async (game_id,chat_id,host_id,guest_id)=>{
 
     const host_connection=clients[host_id] 
@@ -184,8 +230,16 @@ const update_game_state =async (game_id,chat_id,host_id,guest_id)=>{
             game_state:game.state,
             chat_state:chat.state
         }
+
         host_connection.send(JSON.stringify(payload));
         guest_connection.send(JSON.stringify(payload));
+        let is_game_end = is_game_ended (game.state,host_id,guest_id);
+        
+        if( is_game_end !=undefined){//game ended
+            host_connection.send(JSON.stringify(is_game_end));
+            guest_connection.send(JSON.stringify(is_game_end));
+            return;
+        }
     }
     catch(err){
         if(err.message=='players not connected'){
@@ -201,7 +255,7 @@ const update_game_state =async (game_id,chat_id,host_id,guest_id)=>{
                 //delete game/chat
             }
         }
-
+        console.log(err)
         const error={
             method:'update',
             status:500,
@@ -214,8 +268,6 @@ const update_game_state =async (game_id,chat_id,host_id,guest_id)=>{
     setTimeout(() => {update_game_state(game_id,chat_id,host_id,guest_id)},100)//called every 500 ms
 
 }
-
-
 
 const add_connection =async (ws,user_id)=>{
     try {
