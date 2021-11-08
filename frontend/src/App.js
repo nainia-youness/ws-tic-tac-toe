@@ -12,7 +12,7 @@ import PublicRoute from './routes/PublicRoute';
 
 function App() {
   const [wsConnectionError, setWsConnectionError] = useState();
-
+  
   const  ws = new w3cwebsocket('ws://127.0.0.1:8080/websocket');
 
   useEffect(() => {

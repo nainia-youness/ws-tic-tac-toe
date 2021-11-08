@@ -29,42 +29,38 @@ router.ws('/', function(ws, req) {
 
     ws.on('connection', function(msg) {
         console.log(msg)
+        console.log('i am connected')
       });
     ws.on('message', function(msg) {// accept request from user
         const result=JSON.parse(msg)
         console.log(result)
+        const user_id=result.user_id
+        handle_connection_changes(ws,userid)
         if(result.method==='connect'){
-            const user_id=result.user_id
             add_connection(ws,user_id)
         }
         else if(result.method==='create'){
-            const user_id=result.user_id
             const sign=result.sign
             add_game_and_chat(ws,user_id,sign)
         }
         else if(result.method==='available'){
-            const user_id=result.user_id
             const game_id=result.game_id
             update_game_is_available(ws,user_id,game_id)
         }
         else if(result.method==='join'){
-            const user_id=result.user_id
             look_for_available_game_and_broadcast(ws,user_id)
         }
         else if(result.method==='chat'){
-            const user_id=result.user_id
             const chat_id=result.chat_id
             const content=result.content
             add_chat(ws,user_id,chat_id,content)
         }
         else if(result.method==='play'){
-            const user_id=result.user_id
             const game_id=result.game_id
             const move=result.move
             add_move(ws,user_id,game_id,move)
         }
         else if(result.method==='close'){
-            const user_id=result.user_id
             const game_id=result.game_id
             const chat_id=result.chat_id
             remove_client(ws,user_id,game_id,chat_id)
@@ -74,6 +70,13 @@ router.ws('/', function(ws, req) {
         console.log('user closed connection with no warning')
       });
   });
+
+const update_game_is_available=async (ws,user_id){
+    if(clients[user_id]){//if connection exist
+        if(clients[user_id] != ws)//connection has changed
+            clients[user_id]=ws
+    }
+}
 
 const update_game_is_available=async (ws,user_id,game_id)=>{
     try{
