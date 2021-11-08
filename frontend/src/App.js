@@ -7,10 +7,10 @@ import SignIn from './pages/SignIn';
 import PageNotFound from './pages/PageNotFound';
 import SignUp from './pages/SignUp';
 import {w3cwebsocket} from 'websocket';
-//import { WebSocketServer } from 'ws'
+import PrivateRoute from './routes/PrivateRoute';
+import PublicRoute from './routes/PublicRoute';
+
 function App() {
-  const [websocketError, setWebsocketError] = useState();
-  const [websocketResponse, setWebsocketResponse] = useState();
   const [wsConnectionError, setWsConnectionError] = useState();
 
   const  ws = new w3cwebsocket('ws://127.0.0.1:8080/websocket');
@@ -20,24 +20,23 @@ function App() {
       ws.onmessage = (message) =>{
         const response=JSON.parse(message.data)
         console.log(response)
-        setWebsocketError('')
+        setWsConnectionError('')
       }
     }
     catch(err){
       console.log(err)
-      setWebsocketError(response.error.message)
+      setWsConnectionError(response.error.message)
     }
   }, [])
-  
   
   return (
     <BrowserRouter>
          <Switch>
-            <Route path="/play" render={() => (<Play client={ws} wsConnectionError={wsConnectionError}/>)}/>
-            <Route path="/createJoinGame" render={() => (<CreateJoinGame client={ws} wsConnectionError={wsConnectionError}/>)}/>
-            <Route path="/signInSignUp" component={SignInSignUp}/>
-            <Route path="/signIn"  render={() => (<SignIn client={ws} wsConnectionError={wsConnectionError}/>)}/>
-            <Route path="/signUp"  render={() => (<SignUp client={ws} wsConnectionError={wsConnectionError}/>)}/>
+            <PrivateRoute  path="/createJoinGame" component={CreateJoinGame} ws={ws} wsConnectionError={wsConnectionError}/>
+            <PrivateRoute  path="/play" component={Play} ws={ws} wsConnectionError={wsConnectionError}/>
+            <PublicRoute path="/signInSignUp" component={SignInSignUp} ws={ws} wsConnectionError={wsConnectionError}/>
+            <PublicRoute path="/signIn" component={SignIn} ws={ws} wsConnectionError={wsConnectionError}/>
+            <PublicRoute path="/signUp" component={SignUp} ws={ws} wsConnectionError={wsConnectionError}/>
             <Route  path='*' exact={true}  component={PageNotFound}/>
         </Switch>
     </BrowserRouter>

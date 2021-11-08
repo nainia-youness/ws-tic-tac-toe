@@ -59,7 +59,7 @@ function SignIn(props) {
         }
     }
 
-    if(isRedirect){
+    if(isRedirect && localStorage.getItem('user_id') && error!=''){
         return <Redirect to={"/createJoinGame"}/>
     }
 
