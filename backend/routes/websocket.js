@@ -35,7 +35,7 @@ router.ws('/', function(ws, req) {
         const result=JSON.parse(msg)
         console.log(result)
         const user_id=result.user_id
-        handle_connection_changes(ws,userid)
+        handle_connection_changes(ws,user_id)
         if(result.method==='connect'){
             add_connection(ws,user_id)
         }
@@ -71,7 +71,7 @@ router.ws('/', function(ws, req) {
       });
   });
 
-const update_game_is_available=async (ws,user_id){
+const handle_connection_changes = (ws,user_id)=>{
     if(clients[user_id]){//if connection exist
         if(clients[user_id] != ws)//connection has changed
             clients[user_id]=ws
@@ -168,38 +168,51 @@ const add_move= async(ws,user_id,game_id,move)=>{
     }
 }
 
-const update_game_state =async ()=>{
-    //get all games
-    const all_games= await Game.find({})
-    if(all_games){
-        for(const i in all_games){
-            const host_connection=clients[all_games[i].host_gamer_id.user_id] 
-            const guest_connection= clients[all_games[i].guest_gamer_id.user_id]
-            try{
-                const chat= await Chat.findOne({game_id:all_games[i]._id})
-                if(!chat) throw Error('chat not found')
-                const payload={
-                    method:'update',
-                    status:'200',
-                    game_state:all_games[i].state,
-                    chat_state:chat.state
-                }
-                host_connection.send(JSON.stringify(payload));
-                guest_connection.send(JSON.stringify(payload));
-            }
-            catch(err){
-                const error={
-                    method:'update',
-                    status:500,
-                    error:err.message
-                }
-                host_connection.send(JSON.stringify(error));
-                guest_connection.send(JSON.stringify(error));
-            }
+const update_game_state =async (game_id,chat_id,host_id,guest_id)=>{
+
+    const host_connection=clients[host_id] 
+    const guest_connection= clients[guest_id]
+    try{
+        if(!host_connection || !guest_connection) throw Error('players not connected')
+        const game= await Game.findOne({_id:game_id})
+        const chat= await Chat.findOne({_id:chat_id})
+        if(!chat) throw Error('chat not found')
+        if(!game) throw Error('game not found')
+        const payload={
+            method:'update',
+            status:'200',
+            game_state:game.state,
+            chat_state:chat.state
         }
+        host_connection.send(JSON.stringify(payload));
+        guest_connection.send(JSON.stringify(payload));
+    }
+    catch(err){
+        if(err.message=='players not connected'){
+            if(!host_connection && guest_connection){
+                //delete game/chat
+                //send to guest that he won
+            }
+            else if(!guest_connection && host_connection){
+                //delete game/chat
+                //send to host that he won
+            }
+            else if(!host_connection && !guest_connection){
+                //delete game/chat
+            }
         }
 
-    setTimeout(update_game_state,100)//called every 500 ms
+        const error={
+            method:'update',
+            status:500,
+            error:err.message
+        }
+        host_connection.send(JSON.stringify(error));
+        guest_connection.send(JSON.stringify(error));
+        return;
+    }
+    setTimeout(() => {update_game_state(game_id,chat_id,host_id,guest_id)},100)//called every 500 ms
+
 }
 
 
@@ -284,8 +297,8 @@ const look_for_available_game_and_broadcast=async (ws,user_id)=>{
         //TODO: Send message to users
         //host_connection.connection.send(JSON.stringify(payload))
         //guest_connection.connection.send(JSON.stringify(payload))
-
-        update_game_state()
+  
+        update_game_state(updated_game._id,chat._id,host_id,guest_id)
     }
     catch(err){
         ws.send(JSON.stringify({
