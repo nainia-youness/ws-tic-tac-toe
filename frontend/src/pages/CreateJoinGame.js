@@ -90,7 +90,15 @@ function CreateJoinGame(props) {
         }
     }
     
-    
+    const cancelGameCreation=()=>{
+        const payload={
+            method:'cancel_game_creation',
+            user_id:user_id,
+            game_id:localStorage.getItem('game_id'),
+            chat_id:localStorage.getItem('chat_id')
+        }
+        props.client.send(JSON.stringify(payload))        
+    }
     const create_game=()=>{
         setButton1Disable(true)
         setButton2Disable(true)
@@ -152,13 +160,22 @@ function CreateJoinGame(props) {
                     </>
                 }
                 {isSpinner &&
-                    <MDBRow >
-                        <MDBCol>
-                            <div class="spinner-border text-secondary" role="status">
-                                <span class="visually-hidden"></span>
-                            </div>
-                        </MDBCol>
-                    </MDBRow>
+                    <>
+                        <MDBRow >
+                            <MDBCol>
+                                <div class="spinner-border text-secondary" role="status">
+                                    <span class="visually-hidden"></span>
+                                </div>
+                            </MDBCol>
+                        </MDBRow>
+                        <MDBRow >
+                            <MDBCol>
+                                <button type="button" class="btn btn-outline-secondary" data-mdb-ripple-color="dark" onClick={cancelGameCreation}>
+                                    Cancel
+                                </button>
+                            </MDBCol>
+                        </MDBRow>
+                  </>  
                 }
                     <MDBRow >
                         <MDBCol style={{color:"red"}}>
@@ -169,7 +186,6 @@ function CreateJoinGame(props) {
             } 
             title={username} client={props.client}>    
             </Card>
-
         </>
     )
 }

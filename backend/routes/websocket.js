@@ -65,29 +65,52 @@ router.ws('/', function(ws, req) {
             const chat_id=result.chat_id
             remove_client(ws,user_id,game_id,chat_id)
         }
+        else if(result.method==='cancel_game_creation'){
+            const game_id=result.game_id
+            const chat_id=result.chat_id
+            cancel_game_creation(ws,game_id,chat_id)
+        }
         else if(result.method==='change_connection'){
-            console.log("connection changed")
             handle_connection_changes(ws,user_id)
-            
         }
       });
     ws.on('close', function(msg) {
         remove_client(ws)
-        for(const key in clients){
-            if(clients[key]==ws){
-                delete clients[key];
-            }
-        }
         console.log('user closed connection with no warning')
       });
   });
+
+
+  const cancel_game_creation= async(ws,user_id,game_id,chat_id)=>{
+    try{
+            //remove game
+            if(game_id)
+                await Game.deleteOne({_id:game_id})
+            //remove chat
+            if(chat_id)
+                await Chat.deleteOne({_id:chat_id})
+            ws.send(JSON.stringify({
+                    method:'cancel_game_creation',
+                    status:200,
+                    message:'game canceled'
+            }))
+    }
+    catch(err){
+        ws.send(JSON.stringify({
+            method:'cancel_game_creation',
+            status:500,
+            error:err.message
+        }))
+    }
+}
+
 
 const remove_client= async(ws,user_id,game_id,chat_id)=>{
     try{
         if(user_id){
 
             //remove connection from client list
-                delete clients[user_id];
+            delete clients[user_id];
             //remove game
             if(game_id)
                 await Game.deleteOne({_id:game_id})
@@ -103,9 +126,10 @@ const remove_client= async(ws,user_id,game_id,chat_id)=>{
             }))
         }
         else{
-            if(!clients[user_id]){//if connection exist
-                if(clients[user_id] != ws)//connection has changed
-                    clients[user_id]=ws
+            for(const key in clients){
+                if(clients[key]==ws){
+                    delete clients[key];
+                }
             }
         }
     }
@@ -327,7 +351,6 @@ const update_game_state =async (game_id,chat_id,host_id,guest_id)=>{
         return;
     }
     setTimeout(() => {update_game_state(game_id,chat_id,host_id,guest_id)},100)//called every 500 ms
-
 }
 
 const add_connection =async (ws,user_id)=>{

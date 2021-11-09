@@ -105,15 +105,14 @@ function TicTacToe(props) {
                 console.log('not your turn')
             }
             else{
-                if(response.winning_indexes)//nobody disconnected
-                {
-                    if(response.is_draw){
-                        setButsState(["btn btn-primary","btn btn-primary","btn btn-primary","btn btn-primary","btn btn-primary",
-                        "btn btn-primary","btn btn-primary","btn btn-primary","btn btn-primary"])
-                        setEndGameState('draw')
-                        props.setEndGameState('draw')
-                    }
-                    else{
+                if(response.is_draw){
+                    setButsState(["btn btn-primary","btn btn-primary","btn btn-primary","btn btn-primary","btn btn-primary",
+                    "btn btn-primary","btn btn-primary","btn btn-primary","btn btn-primary"])
+                    setEndGameState('draw')
+                    props.setEndGameState('draw')
+                }
+                else{
+                    if(response.winning_indexes){
                         let butState
                         if(user_id==response.end_game_state.winner_id){
                             butState='btn btn-outline-success'
@@ -133,14 +132,13 @@ function TicTacToe(props) {
                             [winning_indexes[2]]: butState
                         }))
                     }
+                    else{
+                        setEndGameState('win')
+                        props.setEndGameState('win')
+                        setButsState(['btn btn-outline-success','btn btn-outline-success','btn btn-outline-success','btn btn-outline-success',
+                        'btn btn-outline-success','btn btn-outline-success','btn btn-outline-success','btn btn-outline-success','btn btn-outline-success'])
+                    }
                 }
-                else{//the opponent disconnected
-                    setEndGameState('win')
-                    props.setEndGameState('win')
-                    setButsState(['btn btn-outline-success','btn btn-outline-success','btn btn-outline-success','btn btn-outline-success',
-                    'btn btn-outline-success','btn btn-outline-success','btn btn-outline-success','btn btn-outline-success','btn btn-outline-success'])
-                }
-
                 setIsGameEnded(true)
                 props.setIsGameEnded(true)
             }
