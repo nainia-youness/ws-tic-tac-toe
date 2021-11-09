@@ -8,6 +8,10 @@
 - cd backend then npm start
 - cd frontend then npm start
 
+# Demonstration
+
+demonstrationVideo.mp4
+
 # Description
 
 A React.js/nodejs project that uses Websockets to:
