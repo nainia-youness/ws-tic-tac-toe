@@ -35,7 +35,7 @@ router.ws('/', function(ws, req) {
         const result=JSON.parse(msg)
         console.log(result)
         const user_id=result.user_id
-       
+        handle_connection_changes(ws,user_id)
         if(result.method==='connect'){
             add_connection(ws,user_id)
         }
@@ -60,53 +60,68 @@ router.ws('/', function(ws, req) {
             const move=result.move
             add_move(ws,user_id,game_id,move)
         }
-        else if(result.method==='close'){
+        else if(result.method==='disconnect'){
             const game_id=result.game_id
             const chat_id=result.chat_id
             remove_client(ws,user_id,game_id,chat_id)
         }
-        else if(result.method==='change_connection'){//needs to be received after the connection change
+        else if(result.method==='change_connection'){
             console.log("connection changed")
             handle_connection_changes(ws,user_id)
             
         }
-        else if(result.method==='disconnect'){
-            const game_id=result.game_id
-            const chat_id=result.chat_id
-            disconnect(ws,user_id,game_id,chat_id)
-        }
       });
     ws.on('close', function(msg) {
-        //close connection
-
-        //i always remove the ws from client
-
-
-        //here i get the old connection
-        // if it s the same as the one in clients => he didn't refresh => delete the connection
-        //if it s different than the one in clients => he did refresh =>
+        remove_client(ws)
         for(const key in clients){
             if(clients[key]==ws){
                 delete clients[key];
             }
         }
-        //console.log(msg)
         console.log('user closed connection with no warning')
       });
   });
 
-  const disconnect = (ws,user_id,game_id,chat_id)=>{
+const remove_client= async(ws,user_id,game_id,chat_id)=>{
+    try{
+        if(user_id){
 
+            //remove connection from client list
+                delete clients[user_id];
+            //remove game
+            if(game_id)
+                await Game.deleteOne({_id:game_id})
+            //remove chat
+            if(chat_id)
+                await Chat.deleteOne({_id:chat_id})
+
+
+            ws.send(JSON.stringify({
+                method:'disconnect',
+                status:200,
+                message:'user disconnected'
+            }))
+        }
+        else{
+            if(!clients[user_id]){//if connection exist
+                if(clients[user_id] != ws)//connection has changed
+                    clients[user_id]=ws
+            }
+        }
+    }
+    catch(err){
+        ws.send(JSON.stringify({
+            method:'disconnect',
+            status:500,
+            error:err.message
+        }))
+    }
 }
-
-
 
 const handle_connection_changes = (ws,user_id)=>{
     if(!clients[user_id]){//if connection exist
         if(clients[user_id] != ws)//connection has changed
             clients[user_id]=ws
-    }else{
-        console.log('the connection is still here')
     }
 }
 
@@ -132,29 +147,7 @@ const update_game_is_available=async (ws,user_id,game_id)=>{
 }
 
 
-const remove_client= async(ws,user_id,game_id,chat_id)=>{
-    try{
-        //remove game
-        const game= await Game.deleteOne({_id:game_id})
-        //remove chat
-        const chat= await Chat.deleteOne({_id:chat_id})
-        //remove connection from client list
-        delete clients[user_id];
 
-        ws.send(JSON.stringify({
-            method:'close',
-            status:200,
-            message:'game ended'
-        }))
-    }
-    catch(err){
-        ws.send(JSON.stringify({
-            method:'close',
-            status:500,
-            error:err.message
-        }))
-    }
-}
 
 
 const add_chat= async(ws,user_id,chat_id,content)=>{
@@ -308,7 +301,6 @@ const update_game_state =async (game_id,chat_id,host_id,guest_id)=>{
             }
             else if(!host_connection && !guest_connection){
                 //delete game/chat
-
             }
             if(conn){
                 conn.send(JSON.stringify({
@@ -321,7 +313,6 @@ const update_game_state =async (game_id,chat_id,host_id,guest_id)=>{
                     }
                 }))
             }
-
         }
         else{
             console.log(err)
@@ -351,7 +342,8 @@ const add_connection =async (ws,user_id)=>{
         ws.send(JSON.stringify({
             method:'connect',
             message:'user connected',
-            status:'200'
+            status:'200',
+            user_id:user_id
         }));
     }
     catch(err){

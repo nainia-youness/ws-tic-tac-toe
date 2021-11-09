@@ -68,7 +68,7 @@ function SignUp(props) {
             <MDBContainer>
                 <MDBRow>
                     <MDBCol>
-                        <Card componentToPassDown={<InputField title="SIGN UP" error={error} updateUsername={updateUsername}  confirmOnClick={confirmOnClick} />} title={localStorage.getItem('username')}></Card>
+                        <Card client={props.client} componentToPassDown={<InputField title="SIGN UP" error={error} updateUsername={updateUsername}  confirmOnClick={confirmOnClick} />} title={localStorage.getItem('username')}></Card>
                     </MDBCol>
                 </MDBRow>
             </MDBContainer>  

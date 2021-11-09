@@ -18,13 +18,6 @@ function App() {
   
   useEffect(() => {
     try{
-      /*if(localStorage.getItem('user_id')){
-        const payload={
-          method:'change_connection',
-          user_id:localStorage.getItem('user_id')
-        }
-        ws.send(JSON.stringify(payload))
-      }*/
       ws.onmessage = (message) =>{
         const response=JSON.parse(message.data)
         console.log(response)
@@ -52,7 +45,7 @@ function App() {
             <PublicRoute path="/signInSignUp" component={SignInSignUp} ws={ws} wsConnectionError={wsConnectionError}/>
             <PublicRoute path="/signIn" component={SignIn} ws={ws} wsConnectionError={wsConnectionError}/>
             <PublicRoute path="/signUp" component={SignUp} ws={ws} wsConnectionError={wsConnectionError}/>
-            <Route  path='*' exact={true}  component={PageNotFound}/>
+            <Route  path='*' exact={true}  render={() => (<PageNotFound client={ws}/>)}/>
         </Switch>
     </BrowserRouter>
   );

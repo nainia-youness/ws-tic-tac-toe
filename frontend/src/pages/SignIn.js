@@ -26,8 +26,7 @@ function SignIn(props) {
             if(response.status!=200) throw Error('')
             if(!data.user_id) throw Error('')
             setUserId(data.user_id)
-            localStorage.setItem('username',username);
-            localStorage.setItem('user_id',data.user_id);
+            
             if(props.client.readyState==1){
                 const payload={
                     method:'connect',
@@ -53,7 +52,11 @@ function SignIn(props) {
             }
             else{
                 if(props.client.readyState==1){
-                    setIsRedirect(true)
+                    if(response.user_id){
+                        localStorage.setItem('username',username);
+                        localStorage.setItem('user_id',userId);
+                        setIsRedirect(true)
+                    }
                 }
             }
         }
@@ -68,7 +71,7 @@ function SignIn(props) {
             <MDBContainer>
                 <MDBRow>
                     <MDBCol>
-                        <Card componentToPassDown={<InputField title="SIGN IN" error={error} updateUsername={updateUsername}  confirmOnClick={confirmOnClick} />} title={localStorage.getItem('username')}></Card>
+                        <Card client={props.client} componentToPassDown={<InputField title="SIGN IN" error={error} updateUsername={updateUsername}  confirmOnClick={confirmOnClick} />} title={localStorage.getItem('username')}></Card>
                     </MDBCol>
                 </MDBRow>
             </MDBContainer>  

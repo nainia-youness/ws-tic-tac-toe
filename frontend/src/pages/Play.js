@@ -21,6 +21,7 @@ export default function Play(props) {
     const [endGameCardBgColor,setEndGameCardBgColor]=useState("")
     const [endGameCardMessage,setEndGameCardMessage]=useState("")
     const [endGameCardColor,setEndGameCardColor]=useState("")
+    const [isGoHome, setIsGoHome] = useState(false);
 
     const [updateResponse,setUpdateResponse]=useState(undefined)
     props.client.onmessage = (message) =>{
@@ -54,6 +55,26 @@ export default function Play(props) {
         }
     },[endGameState])
 
+    const goHome =()=>{
+        //clear localstorage, except username and user_id
+        const username=localStorage.getItem('username')
+        const user_id=localStorage.getItem('user_id')
+        const payload={
+            method:'disconnect',
+            user_id:localStorage.getItem('user_id'),
+            game_id:localStorage.getItem('game_id'),
+            chat_id:localStorage.getItem('chat_id'),
+        }
+        props.client.send(JSON.stringify(payload))
+        localStorage.clear();
+        localStorage.setItem('username',username);
+        localStorage.setItem('user_id',user_id);   
+        setIsGoHome(true)
+    }
+
+    
+    if(isGoHome)
+        return <Redirect to={"/createJoinGame"}/>
 
     return (
         <>  
@@ -67,7 +88,7 @@ export default function Play(props) {
                             <h5 class="card-title">
                                 <span style={{fontSize:"30px",color:endGameCardColor}}>{endGameCardMessage}</span> 
                             </h5>
-                            <button type="button" class="btn btn-outline-secondary" data-mdb-ripple-color="dark">
+                            <button type="button" class="btn btn-outline-secondary" data-mdb-ripple-color="dark" onClick={goHome}>
                                 Home
                             </button>
                         </div>
@@ -103,7 +124,7 @@ export default function Play(props) {
                 </MDBRow>
             </MDBContainer>
         } 
-        title={username} sign={sign} isPlayerTurn={isPlayerTurn}></Card>         
+        title={username} sign={sign} isPlayerTurn={isPlayerTurn} client={props.client}></Card>         
         </>
     )
 }

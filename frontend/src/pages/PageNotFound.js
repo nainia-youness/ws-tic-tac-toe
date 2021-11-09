@@ -3,7 +3,7 @@ import React from 'react'
 import { MDBContainer, MDBRow, MDBCol } from "mdbreact";
 import Card404 from '../components/Card404';
 
-function PageNotFound() {
+function PageNotFound(props) {
     return (
         <>
             <MDBContainer>
@@ -11,7 +11,7 @@ function PageNotFound() {
                     <MDBCol>
                         <Card componentToPassDown={
                             <Card404></Card404>
-                        } title={localStorage.getItem('username')}></Card>
+                        } title={localStorage.getItem('username')} client={props.client}></Card>
                     </MDBCol>
                 </MDBRow>
             </MDBContainer>  

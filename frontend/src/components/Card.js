@@ -1,31 +1,52 @@
-import React from 'react'
+import {React,useState} from 'react'
 import { MDBContainer, MDBRow, MDBCol ,MDBDropdown, MDBDropdownToggle, MDBDropdownMenu, MDBDropdownItem } from "mdbreact";
 import arrow from '../images/arrow.png';
+import { Redirect,useLocation } from 'react-router-dom';
 
 function Card(props) {
 
 
+    const [isGoHome, setIsGoHome] = useState(false);
+    const [isDisconnect, setIsDisconnect] = useState(false);
 
     const Disconnect=()=>{
         console.log('disconnected')
-        //creat localstorage
-        //remove client connection
-        //remove his games and chats
+        const payload={
+            method:'disconnect',
+            user_id:localStorage.getItem('user_id'),
+            game_id:localStorage.getItem('game_id'),
+            chat_id:localStorage.getItem('chat_id'),
+        }
+        props.client.send(JSON.stringify(payload))
         localStorage.clear();
-
+        setIsDisconnect(true)
     }
+    const location = useLocation();
 
+    
     const GoHome=()=>{
         //clear localstorage, except username and user_id
         const username=localStorage.getItem('username')
         const user_id=localStorage.getItem('user_id')
+        const payload={
+            method:'disconnect',
+            user_id:localStorage.getItem('user_id'),
+            game_id:localStorage.getItem('game_id'),
+            chat_id:localStorage.getItem('chat_id'),
+        }
+        props.client.send(JSON.stringify(payload))
         localStorage.clear();
         localStorage.setItem('username',username);
-        localStorage.setItem('user_id',user_id);
-        //remove game and chat
-        
-        //don t remove the connection
+        localStorage.setItem('user_id',user_id);   
+        if(location.pathname!='/createJoinGame')
+            setIsGoHome(true)
     }
+
+    if(isGoHome)
+        return <Redirect to={"/createJoinGame"}/>
+    if(isDisconnect)
+        return <Redirect to={"/signInSignUp"}/>
+
     return (
         <>
             <MDBContainer >

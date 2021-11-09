@@ -167,7 +167,7 @@ function CreateJoinGame(props) {
                     </MDBRow>
             </MDBContainer>
             } 
-            title={username}>    
+            title={username} client={props.client}>    
             </Card>
 
         </>
