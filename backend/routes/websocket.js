@@ -246,6 +246,8 @@ const update_game_state =async (game_id,chat_id,host_id,guest_id)=>{
         let is_game_end = is_game_ended (game.state,host_id,guest_id);
         
         if( is_game_end !=undefined){//game ended
+            const game= await Game.deleteOne({_id:game_id})
+            const chat= await Chat.deleteOne({_id:chat_id})
             host_connection.send(JSON.stringify(is_game_end));
             guest_connection.send(JSON.stringify(is_game_end));
             return;
