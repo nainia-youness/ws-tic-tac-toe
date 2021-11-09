@@ -202,6 +202,8 @@ const is_game_ended =(game_state,gamer1_id,gamer2_id)=>{
                 const loser_id=  !is_host_won ? gamer1_id : gamer2_id
                 return {
                         method:"game_end",
+                        is_draw:false,
+                        status:200,
                         winning_indexes:[index1,index2,index3],
                         end_game_state:{
                             winner_id:winner_id,
@@ -210,7 +212,15 @@ const is_game_ended =(game_state,gamer1_id,gamer2_id)=>{
                 }
             }
     }
-    return undefined
+    if(game_state.length==9)
+        return {
+            method:"game_end",
+            status:200,
+            is_draw:true
+        }
+    else{
+        return undefined
+    }
 }
 
 
