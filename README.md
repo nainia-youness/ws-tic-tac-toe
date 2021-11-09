@@ -10,7 +10,7 @@
 
 # Demonstration
 
-demonstrationVideo.mp4
+![demonstrationVideo](demonstrationVideo.gif)
 
 # Description
 
