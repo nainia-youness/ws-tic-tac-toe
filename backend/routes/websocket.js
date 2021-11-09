@@ -124,6 +124,7 @@ const remove_client= async(ws,user_id,game_id,chat_id)=>{
             }))
         }
         else{
+            //search for connection and delete it
             for(const key in clients){
                 if(clients[key]==ws){
                     delete clients[key];
@@ -198,7 +199,7 @@ const add_move= async(ws,user_id,game_id,move)=>{
             if(is_last_move_from_this_user)
                 throw Error('not users turn')
         }
-        const is_in_game=(user_id==game.host_gamer_id.user_id || user_id==game.guest_gamer_id.user_id)
+        const is_in_game=(user_id==game.host_gamer_id.user_id || user_id==game.guest_gamer_id.user_id)//is user in game
         if(!is_in_game){
             throw Error('user not in the game')
         }
@@ -215,6 +216,7 @@ const add_move= async(ws,user_id,game_id,move)=>{
     }
 }
 
+//check wether the game has ended
 const is_game_ended =(game_state,gamer1_id,gamer2_id)=>{
 
     if(game_state.length<5)
@@ -259,7 +261,7 @@ const is_game_ended =(game_state,gamer1_id,gamer2_id)=>{
                 }
             }
     }
-    if(game_state.length==9)
+    if(game_state.length==9)//it's a draw
         return {
             method:"game_end",
             status:200,
@@ -301,28 +303,27 @@ const update_game_state =async (game_id,chat_id,host_id,guest_id)=>{
         }
     }
     catch(err){
-        if(err.message=='players not connected'){
+        if(err.message=='players not connected'){//one or both players disconnected
             const game= await Game.deleteOne({_id:game_id})
             const chat= await Chat.deleteOne({_id:chat_id})
             let winner_id
             let loser_id
             let conn
             if(!host_connection && guest_connection){
-                //delete game/chat
                 winner_id=guest_id
                 loser_id=host_id
                 conn=guest_connection
-                //send to guest that he won
+                //send to guest gamer that he won
             }
             else if(!guest_connection && host_connection){
                 //delete game/chat
                 winner_id=host_id
                 loser_id=guest_id
                 conn=host_connection
-                //send to host that he won
+                //send to host gamer that he won
             }
             else if(!host_connection && !guest_connection){
-                //delete game/chat
+                
             }
             if(conn){
                 conn.send(JSON.stringify({
@@ -336,7 +337,7 @@ const update_game_state =async (game_id,chat_id,host_id,guest_id)=>{
                 }))
             }
         }
-        else{
+        else{// no body disconnected
             console.log(err)
             const error={
                 method:'update',
@@ -348,7 +349,8 @@ const update_game_state =async (game_id,chat_id,host_id,guest_id)=>{
         }
         return;
     }
-    setTimeout(() => {update_game_state(game_id,chat_id,host_id,guest_id)},100)//called every 500 ms
+    //repeat function every 100ms until someone wins, it's a draw or someone disconnected
+    setTimeout(() => {update_game_state(game_id,chat_id,host_id,guest_id)},100)
 }
 
 const add_connection =async (ws,user_id)=>{
@@ -375,18 +377,20 @@ const add_connection =async (ws,user_id)=>{
 const look_for_available_game_and_broadcast=async (ws,user_id)=>{
     try{
         const filter={is_available:true}
+        //find game
         const game= await Game.findOne(filter)
         if(!game) throw Error('game not found')
+        //update game
         const update={is_available:false,guest_gamer_id:{user_id:user_id,sign:inverse_sign(game.host_gamer_id.sign)}}
         const updated_game= await Game.findOneAndUpdate({_id:game._id},update)
+        //find chat
         const chat= await Chat.findOne({game_id:game._id})
         if(!chat) throw Error('chat not found')
         //find connections
         const host_connection=clients[updated_game.host_gamer_id.user_id] 
         const guest_connection= clients[user_id]
-
         if(!host_connection || !guest_connection) throw Error('connection not found')
-
+        //find users
         const guest_id=user_id
         const host_id=updated_game.host_gamer_id.user_id
         const guest_user= await User.findOne({_id:guest_id})
@@ -394,6 +398,7 @@ const look_for_available_game_and_broadcast=async (ws,user_id)=>{
         if(!guest_user || !host_user){
             throw Error('users not found')
         }
+        //send request
         const gamers={
             host_gamer:{
                 user_id:host_id,
@@ -406,9 +411,6 @@ const look_for_available_game_and_broadcast=async (ws,user_id)=>{
                 username:guest_user.username
             }
         }
-
-
-        //send request
         const payload={
             method:'join',
             game_id:updated_game._id,
@@ -420,7 +422,7 @@ const look_for_available_game_and_broadcast=async (ws,user_id)=>{
 
         host_connection.send(JSON.stringify(payload))
         guest_connection.send(JSON.stringify(payload))
-  
+        //start sending updates
         update_game_state(updated_game._id,chat._id,host_id,guest_id)
     }
     catch(err){
