@@ -20,7 +20,7 @@ function Chat(props) {
                         {props.status=="writeChat" &&
                         <>
                             <div style={{height:"10px"}}></div>
-                            <button style={{textAlign:"left"}} onClick={()=>props.sendChat()} type="button" class="btn btn-outline-secondary" data-mdb-ripple-color="dark">
+                            <button style={{textAlign:"left"}} onClick={()=>props.sendChat()} type="button" class="btn btn-outline-secondary" data-mdb-ripple-color="dark" disabled={props.isGameEnded}>
                                 Send
                             </button> 
                         </>
@@ -41,7 +41,7 @@ function Chat(props) {
                                 <div class="card-body">
                                     <p class="card-text">
                                         <div class="form-outline">
-                                            <input type="text" id="form12" value={props.chat} class="form-control" onChange={e => props.updateChat(e)}/>
+                                            <input type="text" id="form12" value={props.chat} class="form-control" onChange={e => props.updateChat(e)} disabled={props.isGameEnded}/>
                                         </div>
 
                                     </p>

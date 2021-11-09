@@ -14,13 +14,13 @@ export default function Play(props) {
     const adv_sign=localStorage.getItem('adv_sign')
     const sign=localStorage.getItem('sign')
     const is_host=localStorage.getItem('is_host')
-    const [boxList,setBoxList]=useState(['_','_','_','_','_','_','_','_','_'])
     const [isPlayerTurn,setIsPlayerTurn]=useState(is_host=='false' ? false : true)
+    const [isGameEnded,setIsGameEnded]=useState(false)
+    const [endGameState,setEndGameState]=useState('')
 
-    const [modal,setModal]=useState(false)
-    const [showModal,setShowModal]=useState(false)
-
-
+    const [endGameCardBgColor,setEndGameCardBgColor]=useState("")
+    const [endGameCardMessage,setEndGameCardMessage]=useState("")
+    const [endGameCardColor,setEndGameCardColor]=useState("")
 
     const [updateResponse,setUpdateResponse]=useState(undefined)
     props.client.onmessage = (message) =>{
@@ -33,18 +33,50 @@ export default function Play(props) {
             setUpdateResponse(response)
         }
     }
+    
+    useEffect(()=>{
+        if(endGameState=='win'){
+            setEndGameCardBgColor('#81C784')
+            setEndGameCardMessage('YOU WON')
+            setEndGameCardColor('green')
+        }
+        else if(endGameState=='lose'){
+            setEndGameCardBgColor('#EF9A9A')
+            setEndGameCardMessage('YOU LOST')
+            setEndGameCardColor('red')
+        }
+        else if(endGameState=='draw'){
+            setEndGameCardBgColor('#90CAF9')
+            setEndGameCardMessage('DRAW')
+            setEndGameCardColor('blue')
+        }
+    },[endGameState])
 
-    const toggle = () => {
-        setModal(!modal)
-    }
 
     return (
-        <>   
+        <>  
         <Card componentToPassDown={
             <MDBContainer>
+                {isGameEnded &&
                 <MDBRow >
                     <MDBCol>
-                        <TicTacToe  client={props.client} updateResponse={updateResponse} setIsPlayerTurn={setIsPlayerTurn} setBoxList={setBoxList}/>
+                    <div class="card text-center" style={{backgroundColor:endGameCardBgColor}}>
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <span style={{fontSize:"30px",color:endGameCardColor}}>{endGameCardMessage}</span> 
+                            </h5>
+                            <button type="button" class="btn btn-outline-secondary" data-mdb-ripple-color="dark">
+                                Home
+                            </button>
+                        </div>
+                        </div>
+                    </MDBCol>
+                </MDBRow>
+                }
+
+                <MDBRow >
+                    <MDBCol>
+                        <TicTacToe  client={props.client} updateResponse={updateResponse} setIsGameEnded={setIsGameEnded} setEndGameState={setEndGameState} setIsPlayerTurn={setIsPlayerTurn} />
                     </MDBCol>
                 </MDBRow>
                 <MDBRow >
@@ -64,7 +96,7 @@ export default function Play(props) {
                 </MDBRow>
                 <MDBRow >
                     <MDBCol>
-                        <ChatRoom client={props.client} updateResponse={updateResponse}/>
+                        <ChatRoom isGameEnded={isGameEnded} client={props.client} updateResponse={updateResponse}/>
                     </MDBCol>
                 </MDBRow>
             </MDBContainer>
@@ -72,22 +104,4 @@ export default function Play(props) {
         title={username} sign={sign} isPlayerTurn={isPlayerTurn}></Card>         
         </>
     )
-}//setChatRoom={setChatRoom}
-/*
-                <MDBRow >
-                    <MDBCol>
-                        <MDBBtn onClick={()=>setModal(true)}>Modal</MDBBtn>
-                        <MDBModal isOpen={modal} toggle={()=>setModal(!modal)}>
-                            <MDBModalHeader toggle={()=>setModal(!modal)}>Result</MDBModalHeader>
-                            <MDBModalBody>
-                            (...)
-                            </MDBModalBody>
-                            <MDBModalFooter>
-                            <MDBBtn color="secondary" onClick={()=> setModal(!modal)}>Close</MDBBtn>
-                            <MDBBtn color="primary">Save changes</MDBBtn>
-                            </MDBModalFooter>
-                        </MDBModal>
-                    </MDBCol>
-                </MDBRow>
-
-*/
+}

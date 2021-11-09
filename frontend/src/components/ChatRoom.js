@@ -56,7 +56,7 @@ function ChatRoom(props) {
                                     <Chat username={chat.user_id==user_id ? username : adv_username} content={chat.content} status="chat"/>
                                 ))}
                                 <br/>
-                                <Chat username="username1" status="writeChat" chat={chat} updateChat={updateChat} sendChat={sendChat}/>
+                                <Chat username="username1" status="writeChat" isGameEnded={props.isGameEnded} chat={chat} updateChat={updateChat} sendChat={sendChat}/>
                             </p>
                         </div>
                         </div>

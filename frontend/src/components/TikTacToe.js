@@ -34,12 +34,19 @@ function TicTacToe(props) {
     ])
     const [isPlayerTurn,setIsPlayerTurn]=useState(is_host=='false' ? false : true)
     const [isGameEnded,setIsGameEnded]=useState(false)
-    
+    const [endGameState,setEndGameState]=useState('')
+
     useEffect(()=>{
         props.setIsPlayerTurn(isPlayerTurn)
-        props.setBoxList(isPlayerTurn)
     },[isPlayerTurn])
 
+    /*useEffect(()=>{
+        setIsGameEnded(true)
+        props.setIsGameEnded(true)
+        setEndGameState('draw')
+        props.setEndGameState('draw')
+    },[])*/
+   
 
     function setBoxState(boxIndex){
         if(isPlayerTurn && boxList[boxIndex]=='_' && !isGameEnded){
@@ -101,14 +108,20 @@ function TicTacToe(props) {
                 if(response.is_draw){
                     setButsState(["btn btn-primary","btn btn-primary","btn btn-primary","btn btn-primary","btn btn-primary",
                     "btn btn-primary","btn btn-primary","btn btn-primary","btn btn-primary"])
+                    setEndGameState('draw')
+                    props.setEndGameState('draw')
                 }
                 else{
                     let butState
                     if(user_id==response.end_game_state.winner_id){
                         butState='btn btn-outline-success'
+                        setEndGameState('win')
+                        props.setEndGameState('win')
                     }
                     else{
                         butState='btn btn-outline-danger'
+                        setEndGameState('lose')
+                        props.setEndGameState('lose')
                     }
                     const winning_indexes=response.winning_indexes
                     setButsState(butsState=>({
@@ -119,6 +132,7 @@ function TicTacToe(props) {
                     }))
                 }
                 setIsGameEnded(true)
+                props.setIsGameEnded(true)
             }
         }
         }
@@ -129,19 +143,19 @@ function TicTacToe(props) {
         <>
             <MDBContainer style={stylingObject.container}>
                 <MDBRow >
-                    <MDBCol style={stylingObject.col}><TicTacToeBut onClick={() => setBoxState(0)} butState={butsState[0]} boxState={boxList[0]}/></MDBCol>
-                    <MDBCol style={stylingObject.col}><TicTacToeBut onClick={() => setBoxState(1)} butState={butsState[1]}  boxState={boxList[1]}/></MDBCol>
-                    <MDBCol style={stylingObject.col}><TicTacToeBut onClick={() => setBoxState(2)} butState={butsState[2]} boxState={boxList[2]}/></MDBCol>
+                    <MDBCol style={stylingObject.col}><TicTacToeBut isGameEnded={isGameEnded} onClick={() => setBoxState(0)} butState={butsState[0]} boxState={boxList[0]}/></MDBCol>
+                    <MDBCol style={stylingObject.col}><TicTacToeBut isGameEnded={isGameEnded} onClick={() => setBoxState(1)} butState={butsState[1]}  boxState={boxList[1]}/></MDBCol>
+                    <MDBCol style={stylingObject.col}><TicTacToeBut isGameEnded={isGameEnded} onClick={() => setBoxState(2)} butState={butsState[2]} boxState={boxList[2]}/></MDBCol>
                 </MDBRow>
                 <MDBRow>
-                    <MDBCol style={stylingObject.col}><TicTacToeBut onClick={() => setBoxState(3)} butState={butsState[3]} boxState={boxList[3]}/></MDBCol>
-                    <MDBCol style={stylingObject.col}><TicTacToeBut  onClick={() => setBoxState(4)} butState={butsState[4]} boxState={boxList[4]}/></MDBCol>
-                    <MDBCol style={stylingObject.col}><TicTacToeBut onClick={() => setBoxState(5)} butState={butsState[5]} boxState={boxList[5]}/></MDBCol>
+                    <MDBCol style={stylingObject.col}><TicTacToeBut isGameEnded={isGameEnded} onClick={() => setBoxState(3)} butState={butsState[3]} boxState={boxList[3]}/></MDBCol>
+                    <MDBCol style={stylingObject.col}><TicTacToeBut  isGameEnded={isGameEnded} onClick={() => setBoxState(4)} butState={butsState[4]} boxState={boxList[4]}/></MDBCol>
+                    <MDBCol style={stylingObject.col}><TicTacToeBut isGameEnded={isGameEnded} onClick={() => setBoxState(5)} butState={butsState[5]} boxState={boxList[5]}/></MDBCol>
                 </MDBRow>
                 <MDBRow>
-                    <MDBCol style={stylingObject.col} ><TicTacToeBut onClick={() => setBoxState(6)} butState={butsState[6]} boxState={boxList[6]}/></MDBCol>
-                    <MDBCol style={stylingObject.col}><TicTacToeBut  onClick={() => setBoxState(7)} butState={butsState[7]}  boxState={boxList[7]}/></MDBCol>
-                    <MDBCol style={stylingObject.col}><TicTacToeBut  onClick={() => setBoxState(8)} butState={butsState[8]}  boxState={boxList[8]}/></MDBCol>
+                    <MDBCol style={stylingObject.col} ><TicTacToeBut isGameEnded={isGameEnded} onClick={() => setBoxState(6)} butState={butsState[6]} boxState={boxList[6]}/></MDBCol>
+                    <MDBCol style={stylingObject.col}><TicTacToeBut  isGameEnded={isGameEnded} onClick={() => setBoxState(7)} butState={butsState[7]}  boxState={boxList[7]}/></MDBCol>
+                    <MDBCol style={stylingObject.col}><TicTacToeBut  isGameEnded={isGameEnded} onClick={() => setBoxState(8)} butState={butsState[8]}  boxState={boxList[8]}/></MDBCol>
                 </MDBRow>
             </MDBContainer>
         </>

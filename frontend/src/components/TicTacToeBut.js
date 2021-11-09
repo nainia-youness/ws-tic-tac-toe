@@ -14,7 +14,7 @@ function TicTacToeBut(props) {
 
     return (
         <>
-            <button  onClick={props.onClick} style={stylingObject.button} className='ticTacToeBut'type="button" class={props.butState} data-mdb-ripple-color="dark">
+            <button  onClick={props.onClick} style={stylingObject.button} className='ticTacToeBut'type="button" class={props.butState} data-mdb-ripple-color="dark" disabled={props.isGameEnded}>
                 {props.boxState}
             </button>
         </>
