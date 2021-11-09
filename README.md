@@ -2,15 +2,15 @@
 
 # Description
 
-A Reactjs/nodejs project that uses websockets
+A React.js/nodejs project that uses Websockets to:
 
-- create and join games
-- chat in real life with your opponent
+- Create and join tic-tact-toe games
+- Chat in real life with your opponent
 
 # Technologies
 
-- library ws on the backend and websocket on the backend
-- mongodb where we store:
+- Library ws-express on the backend and websocket on the backend
+- Mongodb (MongoDB Atlas) where we store:
   - the users
     example:
     {
@@ -33,4 +33,50 @@ A Reactjs/nodejs project that uses websockets
     game_id:"gid",
     state:[ {user_id:"u1",content:"hello"},{user_id:"u2",content:"hi"}]
     }
-- no password authentication needed, you can sign up and sign in using only a unique username
+- The user's connections were stored in the server as a list
+- The ODM mongoose
+- The server is the one calculating the state and telling the users who won, lost or if it is a draw
+- No password authentication is needed, you can sign up and sign in using only a unique username
+
+# Endpoints
+
+**Backend**
+
+- sign in and sign up are regular endpoints handled using solely express
+- the client send requests to the websocket through the endpoint /websocket.
+  here are the methods
+  - connect : add the client connection in the list of connections in the server
+  - disconnect : to remove client from that list
+  - create : a user create a game (the game is unavailable)
+  - available : make the game available so that another person can join it
+    the user actually sends both create and available at the same time. but i left
+    for flexibility
+  - cancel_game_creation : he no user joins your game even if it's available,
+    you can cancel the search and the game/chat is deleted
+  - join : the user look for games available
+    if he finds one, he joins and the server sends both to him (the guest) and
+    to the game host that the game started.
+  - update : only the server sends this request and don't expect any response from the users
+    he sends it once the game stated(user joined) to both gamers
+    it contains the chat room state and the game state
+    if someone won,lost or it's a draw, the server sends it to both the users
+    if one user lose connection by leaving the page, disconnection, refreshing page or changing route the other user wins
+  - chat : a user's chat is added to corresponding chat room
+  - play : a user's move is added to the corresponding game state
+    since the game is tic-tac-toe, the server makes sure that it's the users turn
+    before adding the move. if not, he sends an error
+
+**Frontend**
+
+private routes
+
+- /signUpSignIn
+- /SignUp
+- /SignIn
+
+private routes
+
+- /createJoinGame
+- /play
+
+* /Not found Page
