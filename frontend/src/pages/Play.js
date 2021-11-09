@@ -29,6 +29,9 @@ export default function Play(props) {
         if(response.method==='update'){
             setUpdateResponse(response)
         }
+        if(response.method==='game_end'){
+            setUpdateResponse(response)
+        }
     }
 
     const toggle = () => {

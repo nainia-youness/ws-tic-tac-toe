@@ -93,39 +93,36 @@ function TicTacToe(props) {
                 }
             }   
         }
-        }
-    }, [props.updateResponse])
-
-
-    useEffect(()=>{
-        const winning_combinations=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[6,4,2]]
-
-        for(const i in winning_combinations){
-            const index1=winning_combinations[i][0]
-            const index2=winning_combinations[i][1]
-            const index3=winning_combinations[i][2]
-
-
-            if(boxList[index1]!='_' && boxList[index1]==boxList[index2] && boxList[index1]==boxList[index3]){
-                let butState=''
-                if(boxList[index1]==sign){
-                    console.log('you won')
-                    butState='btn btn-outline-success'
+        else if(response.method=='game_end'){
+            if(response.status!=200){
+                console.log('not your turn')
+            }
+            else{
+                if(response.is_draw){
+                    setButsState(["btn btn-primary","btn btn-primary","btn btn-primary","btn btn-primary","btn btn-primary",
+                    "btn btn-primary","btn btn-primary","btn btn-primary","btn btn-primary"])
                 }
                 else{
-                    console.log('you lost')
-                    butState='btn btn-outline-danger'
+                    let butState
+                    if(user_id==response.end_game_state.winner_id){
+                        butState='btn btn-outline-success'
+                    }
+                    else{
+                        butState='btn btn-outline-danger'
+                    }
+                    const winning_indexes=response.winning_indexes
+                    setButsState(butsState=>({
+                        ...butsState,
+                        [winning_indexes[0]]: butState,
+                        [winning_indexes[1]]: butState,
+                        [winning_indexes[2]]: butState
+                    }))
                 }
-                setButsState(butsState=>({
-                    ...butsState,
-                    [index1]: butState,
-                    [index2]: butState,
-                    [index3]: butState
-                 }))
                 setIsGameEnded(true)
             }
         }
-    },[boxList])
+        }
+    }, [props.updateResponse])
     
 
     return (
