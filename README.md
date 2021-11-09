@@ -48,23 +48,23 @@ A React.js/nodejs project that uses Websockets to:
   - connect : add the client connection in the list of connections in the server
   - disconnect : to remove client from that list
   - create : a user create a game (the game is unavailable)
-  - available : make the game available so that another person can join it
-    the user actually sends both create and available at the same time. but i left
-    for flexibility
-  - cancel_game_creation : he no user joins your game even if it's available,
+  - available : make the game available so that another person can join it.
+    the user actually sends both create and available at the same time in
+    this implementation.
+  - cancel_game_creation : if no user joins your game even if it's available,
     you can cancel the search and the game/chat is deleted
-  - join : the user look for games available
-    if he finds one, he joins and the server sends both to him (the guest) and
-    to the game host that the game started.
-  - update : only the server sends this request and don't expect any response from the users
-    he sends it once the game stated(user joined) to both gamers
-    it contains the chat room state and the game state
-    if someone won,lost or it's a draw, the server sends it to both the users
-    if one user lose connection by leaving the page, disconnection, refreshing page or changing route the other user wins
-  - chat : a user's chat is added to corresponding chat room
-  - play : a user's move is added to the corresponding game state
+  - join : the user look for available games.
+    if he finds one, he joins in and the server sends both to him (the guest) and
+    to the game host a request telling them that the game started.
+  - update : only the server sends this request and doesn't expect any response from the users.
+    he sends it once the game stated(user joined) to both gamers.
+    it contains the chat room state and the game state.
+    if someone won,lost or it's a draw, the server sends it to both users.
+    if one user lost the websocket connection by leaving the page, disconnecting, refreshing page or changing routes, the other user wins.
+  - chat : the user's chat is added to the corresponding chat room state
+  - play : the user's move is added to the corresponding game state.
     since the game is tic-tac-toe, the server makes sure that it's the users turn
-    before adding the move. if not, he sends an error
+    before adding the move. if it is not, he sends an error
 
 **Frontend**
 
@@ -79,4 +79,4 @@ private routes
 - /createJoinGame
 - /play
 
-* /Not found Page
+/Not found Page
