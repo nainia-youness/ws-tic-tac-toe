@@ -39,13 +39,6 @@ function TicTacToe(props) {
     useEffect(()=>{
         props.setIsPlayerTurn(isPlayerTurn)
     },[isPlayerTurn])
-
-    /*useEffect(()=>{
-        setIsGameEnded(true)
-        props.setIsGameEnded(true)
-        setEndGameState('draw')
-        props.setEndGameState('draw')
-    },[])*/
    
 
     function setBoxState(boxIndex){
