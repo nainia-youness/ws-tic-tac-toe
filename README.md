@@ -1,5 +1,13 @@
 ## ws-tic-tac-toe
 
+# Install
+
+- npm clone https://github.com/nainia-youness/ws-tic-tac-toe.git
+- create an atlas mongodb database with collection users,games and chats
+- create a .env file with PORT,NODE_ENV,DB_USERNAME,DB_PASSWORD,DATABASE_NAME
+- cd backend then npm start
+- cd frontend then npm start
+
 # Description
 
 A React.js/nodejs project that uses Websockets to:
@@ -42,7 +50,7 @@ A React.js/nodejs project that uses Websockets to:
 
 **Backend**
 
-- sign in and sign up are regular endpoints handled using solely express
+- sign in and sign up are regular http endpoints handled using solely express
 - the client send requests to the websocket through the endpoint /websocket.
   here are the methods
   - connect : add the client connection in the list of connections in the server
@@ -57,7 +65,8 @@ A React.js/nodejs project that uses Websockets to:
     if he finds one, he joins in and the server sends both to him (the guest) and
     to the game host a request telling them that the game started.
   - update : only the server sends this request and doesn't expect any response from the users.
-    he sends it once the game stated(user joined) to both gamers.
+    the server sends the update every 100ms to the users and stops only if the game ended or one of them left.
+    he keeps sending it from the beginning of the game(user joined) to both gamers.
     it contains the chat room state and the game state.
     if someone won,lost or it's a draw, the server sends it to both users.
     if one user lost the websocket connection by leaving the page, disconnecting, refreshing page or changing routes, the other user wins.
