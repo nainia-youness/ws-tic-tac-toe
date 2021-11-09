@@ -25,6 +25,7 @@ export default function Play(props) {
     const [isGoHome, setIsGoHome] = useState(false);
 
     const [updateResponse,setUpdateResponse]=useState(undefined)
+
     props.client.onmessage = (message) =>{
         const response=JSON.parse(message.data)
         console.log(response)

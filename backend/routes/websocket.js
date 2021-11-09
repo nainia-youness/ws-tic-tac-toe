@@ -4,7 +4,6 @@ const router=express.Router();
 const Game= require('../models/game.js')
 const Chat= require('../models/chat.js')
 const User= require('../models/user.js')
-const Connection= require('../models/connection.js')
 const {db}  = require ('../config/Database_config.js');
 
 
@@ -355,12 +354,6 @@ const update_game_state =async (game_id,chat_id,host_id,guest_id)=>{
 const add_connection =async (ws,user_id)=>{
     try {
         clients[user_id]=ws
-        //TODO: Store user connection in database
-       /* const connection= new Connection({
-            user_id:user_id,
-            connection:ws
-        })
-        const saved_connection= await connection.save()*/
         ws.send(JSON.stringify({
             method:'connect',
             message:'user connected',
@@ -391,9 +384,7 @@ const look_for_available_game_and_broadcast=async (ws,user_id)=>{
         //find connections
         const host_connection=clients[updated_game.host_gamer_id.user_id] 
         const guest_connection= clients[user_id]
-        //TODO: Get user connection in database
-        /*const host_connection= await Connection.findOne({user_id:updated_game.host_gamer_id.user_id})
-        const guest_connection= await Connection.findOne({user_id:user_id})*/
+
         if(!host_connection || !guest_connection) throw Error('connection not found')
 
         const guest_id=user_id
@@ -429,10 +420,6 @@ const look_for_available_game_and_broadcast=async (ws,user_id)=>{
 
         host_connection.send(JSON.stringify(payload))
         guest_connection.send(JSON.stringify(payload))
-
-        //TODO: Send message to users
-        //host_connection.connection.send(JSON.stringify(payload))
-        //guest_connection.connection.send(JSON.stringify(payload))
   
         update_game_state(updated_game._id,chat._id,host_id,guest_id)
     }
