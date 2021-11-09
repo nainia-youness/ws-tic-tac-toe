@@ -10,7 +10,6 @@ function Card(props) {
     const [isDisconnect, setIsDisconnect] = useState(false);
 
     const Disconnect=()=>{
-        console.log('disconnected')
         const payload={
             method:'disconnect',
             user_id:localStorage.getItem('user_id'),
