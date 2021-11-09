@@ -34,6 +34,8 @@ export default function Play(props) {
         }
     }
     
+ 
+
     useEffect(()=>{
         if(endGameState=='win'){
             setEndGameCardBgColor('#81C784')

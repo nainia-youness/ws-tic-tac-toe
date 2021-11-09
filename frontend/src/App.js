@@ -15,8 +15,16 @@ function App() {
   
   const  ws = new w3cwebsocket('ws://127.0.0.1:8080/websocket');
 
+  
   useEffect(() => {
     try{
+      /*if(localStorage.getItem('user_id')){
+        const payload={
+          method:'change_connection',
+          user_id:localStorage.getItem('user_id')
+        }
+        ws.send(JSON.stringify(payload))
+      }*/
       ws.onmessage = (message) =>{
         const response=JSON.parse(message.data)
         console.log(response)
@@ -28,7 +36,14 @@ function App() {
       setWsConnectionError(response.error.message)
     }
   }, [])
-  
+  window.onbeforeunload = (event) => {
+    const e = event || window.event;
+    // Cancel the event
+    e.preventDefault();
+
+    console.log('page reloaded')
+  };
+
   return (
     <BrowserRouter>
          <Switch>

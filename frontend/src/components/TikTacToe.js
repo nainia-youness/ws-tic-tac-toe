@@ -105,32 +105,42 @@ function TicTacToe(props) {
                 console.log('not your turn')
             }
             else{
-                if(response.is_draw){
-                    setButsState(["btn btn-primary","btn btn-primary","btn btn-primary","btn btn-primary","btn btn-primary",
-                    "btn btn-primary","btn btn-primary","btn btn-primary","btn btn-primary"])
-                    setEndGameState('draw')
-                    props.setEndGameState('draw')
-                }
-                else{
-                    let butState
-                    if(user_id==response.end_game_state.winner_id){
-                        butState='btn btn-outline-success'
-                        setEndGameState('win')
-                        props.setEndGameState('win')
+                if(response.winning_indexes)//nobody disconnected
+                {
+                    if(response.is_draw){
+                        setButsState(["btn btn-primary","btn btn-primary","btn btn-primary","btn btn-primary","btn btn-primary",
+                        "btn btn-primary","btn btn-primary","btn btn-primary","btn btn-primary"])
+                        setEndGameState('draw')
+                        props.setEndGameState('draw')
                     }
                     else{
-                        butState='btn btn-outline-danger'
-                        setEndGameState('lose')
-                        props.setEndGameState('lose')
+                        let butState
+                        if(user_id==response.end_game_state.winner_id){
+                            butState='btn btn-outline-success'
+                            setEndGameState('win')
+                            props.setEndGameState('win')
+                        }
+                        else{
+                            butState='btn btn-outline-danger'
+                            setEndGameState('lose')
+                            props.setEndGameState('lose')
+                        }
+                        const winning_indexes=response.winning_indexes
+                        setButsState(butsState=>({
+                            ...butsState,
+                            [winning_indexes[0]]: butState,
+                            [winning_indexes[1]]: butState,
+                            [winning_indexes[2]]: butState
+                        }))
                     }
-                    const winning_indexes=response.winning_indexes
-                    setButsState(butsState=>({
-                        ...butsState,
-                        [winning_indexes[0]]: butState,
-                        [winning_indexes[1]]: butState,
-                        [winning_indexes[2]]: butState
-                    }))
                 }
+                else{//the opponent disconnected
+                    setEndGameState('win')
+                    props.setEndGameState('win')
+                    setButsState(['btn btn-outline-success','btn btn-outline-success','btn btn-outline-success','btn btn-outline-success',
+                    'btn btn-outline-success','btn btn-outline-success','btn btn-outline-success','btn btn-outline-success','btn btn-outline-success'])
+                }
+
                 setIsGameEnded(true)
                 props.setIsGameEnded(true)
             }
