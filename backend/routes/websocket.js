@@ -76,7 +76,6 @@ router.ws('/', function(ws, req) {
       });
     ws.on('close', function(msg) {
         remove_client(ws)
-        console.log('user closed connection with no warning')
       });
   });
 
@@ -85,7 +84,7 @@ router.ws('/', function(ws, req) {
     try{
         //remove game
         if(game_id)
-        await Game.deleteOne({_id:game_id})
+            await Game.deleteOne({_id:game_id})
         //remove chat
         if(chat_id)
             await Chat.deleteOne({_id:chat_id})

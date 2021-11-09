@@ -29,13 +29,6 @@ function App() {
       setWsConnectionError(response.error.message)
     }
   }, [])
-  window.onbeforeunload = (event) => {
-    const e = event || window.event;
-    // Cancel the event
-    e.preventDefault();
-
-    console.log('page reloaded')
-  };
 
   return (
     <BrowserRouter>
