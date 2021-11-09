@@ -81,19 +81,19 @@ router.ws('/', function(ws, req) {
   });
 
 
-  const cancel_game_creation= async(ws,user_id,game_id,chat_id)=>{
+  const cancel_game_creation= async(ws,game_id,chat_id)=>{
     try{
-            //remove game
-            if(game_id)
-                await Game.deleteOne({_id:game_id})
-            //remove chat
-            if(chat_id)
-                await Chat.deleteOne({_id:chat_id})
-            ws.send(JSON.stringify({
-                    method:'cancel_game_creation',
-                    status:200,
-                    message:'game canceled'
-            }))
+        //remove game
+        if(game_id)
+        await Game.deleteOne({_id:game_id})
+        //remove chat
+        if(chat_id)
+            await Chat.deleteOne({_id:chat_id})
+        ws.send(JSON.stringify({
+            method:'cancel_game_creation',
+            status:200,
+            message:'game canceled'
+        }))
     }
     catch(err){
         ws.send(JSON.stringify({

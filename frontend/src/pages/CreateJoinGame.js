@@ -98,6 +98,10 @@ function CreateJoinGame(props) {
             chat_id:localStorage.getItem('chat_id')
         }
         props.client.send(JSON.stringify(payload))        
+        setButton1Disable(false)
+        setButton2Disable(false)
+        setIsCreateGame(false)
+        setIsSpinner(false)
     }
     const create_game=()=>{
         setButton1Disable(true)
@@ -168,14 +172,16 @@ function CreateJoinGame(props) {
                                 </div>
                             </MDBCol>
                         </MDBRow>
-                        <MDBRow >
-                            <MDBCol>
-                                <button type="button" class="btn btn-outline-secondary" data-mdb-ripple-color="dark" onClick={cancelGameCreation}>
-                                    Cancel
-                                </button>
-                            </MDBCol>
-                        </MDBRow>
                   </>  
+                }
+                {isCreateGame && isSpinner && 
+                    <MDBRow >
+                        <MDBCol>
+                            <button type="button" class="btn btn-outline-secondary" data-mdb-ripple-color="dark" onClick={cancelGameCreation}>
+                                Cancel
+                            </button>
+                        </MDBCol>
+                    </MDBRow>
                 }
                     <MDBRow >
                         <MDBCol style={{color:"red"}}>
