@@ -4,6 +4,7 @@ import { MDBContainer, MDBRow, MDBCol , MDBBtn, MDBModal, MDBModalBody, MDBModal
 import Card from '../components/Card';
 import ChatRoom from '../components/ChatRoom';
 import arrow from '../images/arrow.png';
+import { Redirect } from 'react-router-dom';
 
 export default function Play(props) {
     const user_id=localStorage.getItem('user_id')
@@ -72,7 +73,7 @@ export default function Play(props) {
         setIsGoHome(true)
     }
 
-    
+
     if(isGoHome)
         return <Redirect to={"/createJoinGame"}/>
 
